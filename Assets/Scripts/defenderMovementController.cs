@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class defenderController : MonoBehaviour {
+public class defenderMovementController : MonoBehaviour {
 
 	//define camera to control bounds of window
 	public Camera cam;
@@ -13,9 +13,11 @@ public class defenderController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		
 		if (cam == null) {
 			cam = Camera.main;
 		}
+
 		if (maxSpeed == 0.0f) {
 			maxSpeed = 5f;
 		}
@@ -30,8 +32,11 @@ public class defenderController : MonoBehaviour {
 	
 	// called once per physics timestep
 	void FixedUpdate () {
-	//need to find pointer first then use that to move defender
+		moveDefender();
 
+	}
+	void moveDefender() {
+		//need to find pointer first then use that to move defender
 		Vector3 pointPosition = cam.ScreenToWorldPoint(Input.mousePosition);
 
 		float targetPositionWidth = Mathf.Clamp (pointPosition.x, -maxWidth, maxWidth);
