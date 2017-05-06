@@ -4,11 +4,12 @@ using System.Collections;
 public class playerFireShot : MonoBehaviour {
 
 	public GameObject shot;
-	public float speed;
+	public float shotSpeed;
 
 	public float shotCoolDown;
 
-	private float deltaLastShot = 0.0f;
+	private float deltaLastShot;
+	private string target;
 
 	// Use this for initialization
 	void Start () {
@@ -16,9 +17,12 @@ public class playerFireShot : MonoBehaviour {
 			shotCoolDown = 0.5f;
 		}
 
-		if (speed == 0.0f) {
-			speed = 3.0f;
+		if (shotSpeed == 0.0f || shotSpeed <= 0.0f) {
+			shotSpeed = 3.0f;
 		}
+		//so we can immediatly fire a shot
+		deltaLastShot = shotCoolDown;
+		target = "invader";
 	}
 	
 	// Update is called once per frame
@@ -28,13 +32,16 @@ public class playerFireShot : MonoBehaviour {
 
 		if (Input.GetButton ("Fire1")) {
 			if (deltaLastShot >= shotCoolDown) {
-			
-				GameObject shotInstance = Instantiate (shot, transform.position, Quaternion.identity) as GameObject;
-				shotBehaviour script = shotInstance.GetComponent<shotBehaviour> ();
-				script.speed = 3;
-				script.target = "invader";
-				deltaLastShot = 0.0f;
+				Fire ();
 			}
 		}
+	}
+
+	private void Fire() {
+		GameObject shotInstance = Instantiate (shot, transform.position, Quaternion.identity) as GameObject;
+		shotBehaviour script = shotInstance.GetComponent<shotBehaviour> ();
+		script.speed = shotSpeed;
+		script.target = target;
+		deltaLastShot = 0.0f;
 	}
 }

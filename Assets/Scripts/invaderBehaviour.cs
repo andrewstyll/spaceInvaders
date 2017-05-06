@@ -28,7 +28,7 @@ public class invaderBehaviour : MonoBehaviour {
 		
 		if (spriteRenderer.sprite == position_1) {
 			spriteRenderer.sprite = position_2;
-		} else {
+		} else if (spriteRenderer.sprite == position_2) {
 			spriteRenderer.sprite = position_1;	
 		}
 	}

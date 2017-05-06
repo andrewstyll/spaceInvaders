@@ -28,4 +28,10 @@ public class shotBehaviour : MonoBehaviour {
 	void flipBulletSprite() {
 		spriteRenderer.flipY = !spriteRenderer.flipY;
 	}
+
+	void OnTriggerEnter2D(Collider2D collider) {
+		if (collider.CompareTag ("shot")) {
+			Destroy (gameObject);
+		}
+	}
 }

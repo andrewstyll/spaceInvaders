@@ -30,8 +30,7 @@ public class invaderController : MonoBehaviour {
 	public float spacingX;
 	public float spacingY;
 
-	private GameObject[,] invaders;
-	private invaderBehaviour[,] invaderScripts;
+	private GameObject[] allInvaders;
 
 	// Use this for initialization
 	void Start () {
@@ -43,9 +42,7 @@ public class invaderController : MonoBehaviour {
 		Vector3 maxCornerW = cam.ScreenToWorldPoint(maxCorner);
 		maxWidth = maxCornerW.x;
 
-		GameObject invader;
-		invaders = new GameObject[MAX_ROWS, MAX_COLUMNS];
-		invaderScripts = new invaderBehaviour[MAX_ROWS, MAX_COLUMNS];
+		GameObject invaderPrefab;
 
 		invaderMoveRight = true;
 		invaderMoveDown = false;
@@ -60,21 +57,21 @@ public class invaderController : MonoBehaviour {
 		for (int i = 0; i < MAX_ROWS; i++) {
 			
 			if (i == 0) {
-				invader = invader_1;
+				invaderPrefab = invader_1;
 			} else if (i > 0 && i < 3) {
-				invader = invader_2;
+				invaderPrefab = invader_2;
 			} else {
-				invader = invader_3;
+				invaderPrefab = invader_3;
 			}
 
 			for (int j = 0; j < MAX_COLUMNS; j++) {
 				Vector3 position = new Vector3 (startPositionX+spacingX*j, starPositionY+spacingY*i, 0.0f);
-				invaders[i, j] = Instantiate (invader, position, Quaternion.identity) as GameObject;
-				invaderScripts[i, j] = invaders [i, j].GetComponent<invaderBehaviour> ();
+				GameObject invader = Instantiate (invaderPrefab, position, Quaternion.identity) as GameObject;
 
 				if (i % 2 == 0) {
-					SpriteRenderer invaderSpriteRenderer = invaders [i, j].GetComponent<SpriteRenderer> ();
-					Sprite newStartPostion = invaderScripts[i, j].position_2;
+					invaderBehaviour invaderScript = invader.GetComponent<invaderBehaviour> ();
+					SpriteRenderer invaderSpriteRenderer = invader.GetComponent<SpriteRenderer> ();
+					Sprite newStartPostion = invaderScript.position_2;
 					invaderSpriteRenderer.sprite = newStartPostion;
 				}
 			}
@@ -89,6 +86,10 @@ public class invaderController : MonoBehaviour {
 		if(deltaLastMoved > deltaMove ) {
 			deltaLastMoved -= deltaMove;
 
+			allInvaders = GameObject.FindGameObjectsWithTag("invader");
+
+			// There is an issue with really fast movement, I will need to figure out a new way\
+			// to switch directions. I think I'll just add invisible colliders....
 			if (invaderMoveDown) {
 				invaderMoveDown = false;
 				deltaMove = Mathf.Min (deltaMove*0.9f, deltaMove);
@@ -102,19 +103,16 @@ public class invaderController : MonoBehaviour {
 	void moveInvaders() {
 		bool flip = false;
 
-		for (int i = 0; i < MAX_ROWS; i++) {
-			
-			for (int j = 0; j < MAX_COLUMNS; j++) {
-
-				if (invaders [i, j] != null) {
-					bool retVal = invaderScripts[i, j].move (-maxWidth, maxWidth, invaderSpeed, invaderMoveRight);
-
-					if (flip == false && retVal == true) {
-						flip = true;
-					}
+		if(allInvaders.Length != 0) {
+			foreach(GameObject invader in allInvaders) {
+				invaderBehaviour script = invader.GetComponent<invaderBehaviour> ();
+				bool retVal = script.move (-maxWidth, maxWidth, invaderSpeed, invaderMoveRight);
+				if (flip == false && retVal == true) {
+					flip = true;
 				}
 			}
 		}
+
 		if (flip) {
 			invaderMoveDown = true;
 			invaderMoveRight = !invaderMoveRight;
@@ -122,10 +120,10 @@ public class invaderController : MonoBehaviour {
 	}
 
 	void dropInvaders() {
-		for (int i = 0; i < MAX_ROWS; i++) {
-
-			for (int j = 0; j < MAX_COLUMNS; j++) {
-				invaderScripts[i, j].drop (dropStep);
+		if(allInvaders.Length != 0) {
+			foreach(GameObject invader in allInvaders) {
+				invaderBehaviour script = invader.GetComponent<invaderBehaviour> ();
+				script.drop (dropStep);
 			}
 		}
 	}
